@@ -1,8 +1,58 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<Library.Models.Book>
+@{
+    ViewData["Title"] = "Min bibliotek";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<h2>Min bibliotek</h2>
+
+<form asp-controller="Home" asp-action="Search" method="get">
+    <div class="form-row align-items-center">
+        <div class="col-auto">
+            <label for="searchTerm" class="sr-only">Sökfras</label>
+            <input type="text" class="form-control mb-2" id="searchTerm" name="searchTerm" placeholder="Search term">
+        </div>
+        <div class="col-auto">
+            <label for="searchBy" class="sr-only">Filtrera</label>
+            <select class="form-control mb-2" id="searchBy" name="searchBy">
+                <option value="Title">Titel</option>
+                <option value="Author">Författare</option>
+                <option value="Genre">Genre</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary mb-2">Sök</button>
+        </div>
+    </div>
+</form>
+<br>
+<h2>Index</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Titel</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var book in Model)
+        {
+            <tr>
+                <td>@book.Title</td>
+                <td>
+                    <a asp-controller="Home" asp-action="Details" asp-route-id="@book.Id">Visa mer</a>
+                </td>
+                <td>
+                    @if (book.IsBorrowed())
+{
+    <span class="text-danger">Utlånad</span>
+}
+else
+{
+    <span class="text-success">Hemma</span>
+}
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

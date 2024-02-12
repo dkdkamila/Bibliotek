@@ -1,0 +1,28 @@
+@model Library.Models.Book
+@{
+    ViewData["Title"] = "Låna en bok";
+}
+
+<h2>Låna en bok</h2>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Title)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+    </dl>
+</div>
+
+<form asp-controller="Home" asp-action="Borrow" asp-route-id="@Model.Id" method="post">
+    <div class="form-group">
+        <label asp-for="BorrowerName" class="control-label">Ditt namn</label>
+        <input asp-for="BorrowerName" class="form-control" />
+        <span asp-validation-for="BorrowerName" class="text-danger"></span>
+    </div>
+    <br>
+    <button type="submit" class="btn btn-primary">Låna</button>
+    <a asp-action="Details" asp-route-id="@Model.Id">Avbryt</a>
+</form>

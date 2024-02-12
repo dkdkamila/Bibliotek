@@ -1,6 +1,27 @@
 ﻿@{
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = "Om projektet";
 }
 <h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<p>Projektet är en enkel webbapplikation för bibliotekshantering som är utvecklad med ASP.NET Core och Entity Framework
+    Core. Huvudsyftet med applikationen är att hantera böcker, inklusive lägga till nya böcker, redigera befintliga, ta
+    bort och visa detaljer om varje bok. Sidan erbjuder även en möjlighet till att söka böcker med filtrering på titel,
+    författare eller genre samt att låna ut böcker.</p>
+
+<h2>Struktur och funktioner:</h2>
+
+<li>Applikationen följer MVC-mönstret.</li>
+<li>Projektet har en huvudmodell kallad Book, som representerar en bok i biblioteket. Modellen innehåller egenskaper som
+    titel, författare, genre, låntagarens namn, lånets datum och bokens status.</li>
+<li>För att hantera datalagring använder projektet Entity Framework Core, som gör det möjligt att interagera med en
+    SQL-databas. I detta projekt EF används för att definiera modellklasser och databaskontextklasser samt för att
+    utföra CRUD-operationer mot databasen. </li>
+<li>Applikationen har en controller, HomeController, som hanterar alla HTTP-förfrågningar och styr logiken för varje
+    åtgärd, såsom att visa indexsidan, skapa, redigera, ta bort och visa detaljer om böcker.</li>
+<li>För varje åtgärd som definieras i HomeController, finns en motsvarande vy i mappen Views/Home, inklusive vyer för
+    index, skapande, redigering, detaljer och borttagning av böcker.</li>
+<li>Projektet har också stöd för att låna och återlämna böcker. Genom att klicka på "Låna" -knappen på detaljsidan för
+    en bok kan användaren ange låntagarens namn och låna ut boken. Om boken redan är utlånad kommer användaren inte att
+    se "Låna"-knappen.</li>
+<li>Det finns också en sökfunktion som gör det möjligt för användare att söka efter böcker efter titel, författare eller
+    genre.</li>
