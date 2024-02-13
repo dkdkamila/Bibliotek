@@ -14,7 +14,7 @@ namespace Library.Models
 
         [Required(ErrorMessage = "Genre är obligatorisk!")]
         public string? Genre { get; set; }
-        [Required(ErrorMessage = "Låntagarens namn är obligatoriskt!")]
+
         public string? BorrowerName { get; set; }
         public DateTime? BorrowedDate { get; set; }
         public string? Status { get; set; }

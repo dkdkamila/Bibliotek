@@ -41,7 +41,8 @@ namespace Library.Controllers
         }
 
         // POST: Home/Create
-        [HttpPost, ActionName("Create")]
+        // POST: Home/Create
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title,Author,Genre")] Book book)
         {
@@ -72,7 +73,6 @@ namespace Library.Controllers
 
             return View(book);
         }
-
         // GET: Home/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -90,9 +90,9 @@ namespace Library.Controllers
         }
 
         // POST: Home/Edit/5
-        [HttpPost, ActionName("Edit")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Book book)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Author,Genre")] Book book)
         {
             if (id != book.Id)
             {
@@ -105,7 +105,6 @@ namespace Library.Controllers
                 {
                     _context.Update(book);
                     await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -118,10 +117,10 @@ namespace Library.Controllers
                         throw;
                     }
                 }
+                return RedirectToAction(nameof(Index));
             }
             return View(book);
         }
-
 
 
         // GET: Home/Delete/5
