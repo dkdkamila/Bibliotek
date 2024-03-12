@@ -12,11 +12,19 @@
         </dd>
 
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Author)
+            Författare:
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Author)
+            @if (Model.Author != null)
+            {
+                @Html.DisplayFor(model => model.Author!.Name)
+            }
+            else
+            {
+                <span>No author specified</span>
+            }
         </dd>
+
 
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Genre)

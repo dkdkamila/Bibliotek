@@ -44,12 +44,28 @@ namespace Library.Controllers
         // POST: Home/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Author,Genre")] Book book)
+        public async Task<IActionResult> Create([Bind("Id,Title,Genre,AuthorId")] Book book)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
+                    // Hämta författaren baserat på författarens ID
+                    var author = await _context.Authors.FindAsync(book.Author);
+
+                    if (author != null)
+                    {
+                        // Tilldela författaren till boken
+                        book.Author = author;
+                    }
+                    else
+                    {
+                        // Om författaren inte hittades, lägg till en felmeddelande
+                        ModelState.AddModelError("Author", "Författaren hittades inte.");
+                        return View(book);
+                    }
+
+                    // Lägg till boken i kontexten och spara ändringarna
                     _context.Add(book);
                     await _context.SaveChangesAsync();
                     TempData["SuccessMessage"] = "Boken har lagts till.";
@@ -73,6 +89,7 @@ namespace Library.Controllers
 
             return View(book);
         }
+
         // GET: Home/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -146,13 +163,27 @@ namespace Library.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            // Hitta boken med det angivna id:et
             var book = await _context.Books.FindAsync(id);
+
+            // Kontrollera om boken är null innan du försöker ta bort den
+            if (book == null)
+            {
+                // Boken finns inte, utför lämplig felhantering, till exempel en 404-sida
+                return NotFound();
+            }
+
+            // Boken finns, ta bort den från kontexten och spara ändringarna
             _context.Books.Remove(book);
             await _context.SaveChangesAsync();
+
+            // Omdirigera tillbaka till listan med böcker
             return RedirectToAction(nameof(Index));
         }
 
+
         // GET: Home/Details/5
+        // Hämta bokdetaljer inklusive författaren
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -161,7 +192,10 @@ namespace Library.Controllers
             }
 
             var book = await _context.Books
-                .FirstOrDefaultAsync(m => m.Id == id);
+         .Include(b => b.BookAuthors!)
+             .ThenInclude(ba => ba.Author)
+         .FirstOrDefaultAsync(m => m.Id == id);
+
             if (book == null)
             {
                 return NotFound();
@@ -180,26 +214,31 @@ namespace Library.Controllers
         {
             ViewData["CurrentFilter"] = searchTerm;
 
-            var books = _context.Books.AsQueryable();
+            var booksQuery = _context.Books.AsQueryable();
 
             if (!String.IsNullOrEmpty(searchTerm))
             {
                 if (searchBy == "Title")
                 {
-                    books = books.Where(b => b.Title.Contains(searchTerm));
+                    booksQuery = booksQuery.Where(b => b.Title != null && b.Title.Contains(searchTerm));
                 }
                 else if (searchBy == "Author")
                 {
-                    books = books.Where(b => b.Author.Contains(searchTerm));
+                    booksQuery = booksQuery.Where(b => b.BookAuthors != null && b.BookAuthors.Any(ba => ba.Author != null && ba.Author.Name != null && ba.Author.Name.Contains(searchTerm)));
                 }
                 else if (searchBy == "Genre")
                 {
-                    books = books.Where(b => b.Genre.Contains(searchTerm));
+                    booksQuery = booksQuery.Where(b => b.Genre != null && b.Genre.Contains(searchTerm));
                 }
             }
 
-            return View(await books.ToListAsync());
+            var books = await booksQuery
+              .Include(ba => ba!.Author)
+                .ToListAsync();
+
+            return View(books);
         }
+
 
         // GET: Home/Borrow/5
         public async Task<IActionResult> Borrow(int? id)

@@ -9,8 +9,6 @@ namespace Library.Models
         [Required(ErrorMessage = "Titel är obligatorisk!")]
         public string? Title { get; set; }
 
-        [Required(ErrorMessage = "Författare är obligatorisk!")]
-        public string? Author { get; set; }
 
         [Required(ErrorMessage = "Genre är obligatorisk!")]
         public string? Genre { get; set; }
@@ -34,6 +32,10 @@ namespace Library.Models
                 return false;
             }
         }
+        // Lägg till en egenskap för Author
+        public Author? Author { get; set; }
+        // Navigation property för att koppla till associationsmodellen
+        public ICollection<BookAuthor>? BookAuthors { get; set; }
     }
 }
 
