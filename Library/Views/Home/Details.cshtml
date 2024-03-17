@@ -15,9 +15,12 @@
             Författare:
         </dt>
         <dd class="col-sm-10">
-            @if (Model.Author != null)
+            @if (Model.BookAuthors != null && Model.BookAuthors.Any())
             {
-                @Html.DisplayFor(model => model.Author!.Name)
+                foreach (var bookAuthor in Model.BookAuthors)
+                {
+                    <div>@bookAuthor.Author?.Name</div>
+                }
             }
             else
             {

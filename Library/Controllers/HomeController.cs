@@ -44,52 +44,37 @@ namespace Library.Controllers
         // POST: Home/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Genre,AuthorId")] Book book)
+        public async Task<IActionResult> Create(BookAndAuthorViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
-                try
-                {
-                    // Hämta författaren baserat på författarens ID
-                    var author = await _context.Authors.FindAsync(book.Author);
+                // Skapa en ny författare baserat på ViewModel
+                var author = new Author { Name = viewModel.AuthorName };
 
-                    if (author != null)
-                    {
-                        // Tilldela författaren till boken
-                        book.Author = author;
-                    }
-                    else
-                    {
-                        // Om författaren inte hittades, lägg till en felmeddelande
-                        ModelState.AddModelError("Author", "Författaren hittades inte.");
-                        return View(book);
-                    }
+                // Skapa en ny bok baserat på ViewModel
+                var book = new Book
+                {
+                    Title = viewModel.Title,
+                    Genre = viewModel.Genre,
+                    // Initialisera BookAuthors-samlingen och lägg till den nya författaren
+                    BookAuthors = new List<BookAuthor>()
+                };
 
-                    // Lägg till boken i kontexten och spara ändringarna
-                    _context.Add(book);
-                    await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = "Boken har lagts till.";
-                    return RedirectToAction(nameof(Index));
-                }
-                catch (DbUpdateException ex)
-                {
-                    ModelState.AddModelError("", "Ett fel uppstod när boken skulle skapas. Vänligen försök igen.");
-                    _logger.LogError($"Databasfel vid försök att skapa bok: {ex.Message}");
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError("", "Ett oväntat fel uppstod när boken skulle skapas. Vänligen försök igen.");
-                    _logger.LogError($"Oväntat fel vid försök att skapa bok: {ex.Message}");
-                }
-            }
-            else
-            {
-                TempData["ErrorMessage"] = "Boken kunde inte läggas till. Vänligen kontrollera inmatningsfälten.";
+                // Koppla boken med den nya författaren genom BookAuthor
+                book.BookAuthors.Add(new BookAuthor { Book = book, Author = author });
+
+                // Lägg till den nya boken 
+                // i  DbContext och spara ändringarna
+                _context.Books.Add(book);
+                await _context.SaveChangesAsync();
+
+                // Redirect efter framgångsrik skapande
+                return RedirectToAction(nameof(Index));
             }
 
-            return View(book);
+
+            return View(viewModel);
         }
-
         // GET: Home/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
